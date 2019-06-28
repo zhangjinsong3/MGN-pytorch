@@ -3,6 +3,7 @@ from os.path import join
 import json
 import shutil
 import numpy as np
+from tqdm import tqdm
 
 data_path = '../../Opensource_datasets/Boxes'
 json_path = join(data_path, 'Info/train.json')
@@ -24,7 +25,7 @@ for folder in folders:
         os.makedirs(join(data_path, folder))
 
 # copy train test images
-for image_info in images_info:
+for image_info in tqdm(images_info):
     copy_folder = ''
 
     if int(image_info['id']) < train_ids:
@@ -34,17 +35,17 @@ for image_info in images_info:
 
     old_path = join(data_path, 'Image', image_info['image_name'])
     copy_path = join(data_path, copy_folder, image_info['image_name'])
-    print('copy image from %s to %s' %(old_path, copy_path))
+    # print('copy image from %s to %s' % (old_path, copy_path))
     shutil.copy(old_path, copy_path)
 
 
 # randomly copy an p image to query image
 copy_folder = folders[-1]
-for i in range(train_ids, num_ids):
+for i in tqdm(range(train_ids, num_ids)):
     image_ps = [x['image_name'] for x in images_info if x['image_name'].find('%4d_p_' % i) > -1]
     # print(image_ps)
     random_choice = np.random.randint(len(image_ps))
     old_path = join(data_path, 'Image', image_ps[random_choice])
     copy_path = join(data_path, copy_folder, image_ps[random_choice])
-    print('copy image from %s to %s' % (old_path, copy_path))
+    # print('copy image from %s to %s' % (old_path, copy_path))
     shutil.copy(old_path, copy_path)
