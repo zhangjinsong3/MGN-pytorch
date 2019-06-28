@@ -3,6 +3,7 @@
 import os
 import re
 
+
 def list_pictures(directory, ext='jpg|jpeg|bmp|png|ppm'):
     assert os.path.isdir(directory), 'dataset is not exists!{}'.format(directory)
 
