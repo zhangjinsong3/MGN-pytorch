@@ -39,19 +39,35 @@ class MGN(nn.Module):
         self.p1 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_g_conv5))
         self.p2 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_p_conv5))
         self.p3 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_p_conv5))
-        
+
+        ##########################################################################
+        # Note(zjs): make the kernel size flexible for input image shape
+        # if args.pool == 'max':
+        #     pool2d = nn.MaxPool2d
+        # elif args.pool == 'avg':
+        #     pool2d = nn.AvgPool2d
+        # else:
+        #     raise Exception()
+        #
+        # self.maxpool_zg_p1 = pool2d(kernel_size=(12, 4))
+        # self.maxpool_zg_p2 = pool2d(kernel_size=(24, 8))
+        # self.maxpool_zg_p3 = pool2d(kernel_size=(24, 8))
+        # self.maxpool_zp2 = pool2d(kernel_size=(12, 8))
+        # self.maxpool_zp3 = pool2d(kernel_size=(8, 8))
+
         if args.pool == 'max':
-            pool2d = nn.MaxPool2d
+            pool2d = nn.AdaptiveMaxPool2d
         elif args.pool == 'avg':
-            pool2d = nn.AvgPool2d
+            pool2d = nn.AdaptiveAvgPool2d
         else:
             raise Exception()
 
-        self.maxpool_zg_p1 = pool2d(kernel_size=(12, 4))
-        self.maxpool_zg_p2 = pool2d(kernel_size=(24, 8))
-        self.maxpool_zg_p3 = pool2d(kernel_size=(24, 8))
-        self.maxpool_zp2 = pool2d(kernel_size=(12, 8))
-        self.maxpool_zp3 = pool2d(kernel_size=(8, 8))
+        self.maxpool_zg_p1 = pool2d(output_size=(1, 1))
+        self.maxpool_zg_p2 = pool2d(output_size=(1, 1))
+        self.maxpool_zg_p3 = pool2d(output_size=(1, 1))
+        self.maxpool_zp2 = pool2d(output_size=(2, 1))
+        self.maxpool_zp3 = pool2d(output_size=(3, 1))
+        ##########################################################################
 
         reduction = nn.Sequential(nn.Conv2d(2048, args.feats, 1, bias=False), nn.BatchNorm2d(args.feats), nn.ReLU())
 

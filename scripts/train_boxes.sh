@@ -5,9 +5,11 @@ CUDA_VISIBLE_DEVICES=6,7 python main.py  \
 --data_train Boxes \
 --data_test Boxes \
 --num_classes 3000 \
+--height 256 \
+--width 256 \
 --batchid 8  \
 --batchtest 16  \
---test_every 20  \
+--test_every 10  \
 --epochs 160  \
 --decay_type step_120_140  \
 --loss 1*CrossEntropy+2*Triplet  \
@@ -15,7 +17,7 @@ CUDA_VISIBLE_DEVICES=6,7 python main.py  \
 --re_rank  \
 --random_erasing  \
 --save Boxes_MGN_adam_margin_1.2  \
---nThread 1 \
+--nThread 0 \
 --nGPU 2   \
 --lr 2e-4  \
 --optimizer ADAM \
