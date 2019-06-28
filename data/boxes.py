@@ -50,7 +50,8 @@ class Boxes(dataset.Dataset):
         :param file_path: unix style file path
         :return: camera id
         """
-        return int(file_path.split('/')[-1].split('_')[2])
+        print()
+        return int(file_path.split('/')[-1].split('.')[0].split('_')[2])
 
     @property
     def ids(self):
