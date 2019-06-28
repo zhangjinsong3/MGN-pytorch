@@ -6,7 +6,9 @@ parser.add_argument('--nThread', type=int, default=2, help='number of threads fo
 parser.add_argument('--cpu', action='store_true', help='use cpu only')
 parser.add_argument('--nGPU', type=int, default=1, help='number of GPUs')
 
-parser.add_argument("--datadir", type=str, default="Market-1501-v15.09.15", help='dataset directory')
+parser.add_argument("--datadir", type=str,
+                    default="../../Opensource_datasets/Market-1501-v15.09.15",
+                    help='dataset directory')
 parser.add_argument('--data_train', type=str, default='Market1501', help='train dataset name')
 parser.add_argument('--data_test', type=str, default='Market1501', help='test dataset name')
 
@@ -30,7 +32,8 @@ parser.add_argument('--num_classes', type=int, default=751, help='')
 
 
 parser.add_argument("--lr", type=float, default=2e-4, help='learning rate')
-parser.add_argument('--optimizer', default='ADAM', choices=('SGD','ADAM','NADAM','RMSprop'), help='optimizer to use (SGD | ADAM | NADAM | RMSprop)')
+parser.add_argument('--optimizer', default='ADAM', choices=('SGD','ADAM','NADAM','RMSprop'),
+                    help='optimizer to use (SGD | ADAM | NADAM | RMSprop)')
 parser.add_argument('--momentum', type=float, default=0.9, help='SGD momentum')
 parser.add_argument('--dampening', type=float, default=0, help='SGD dampening')
 parser.add_argument('--nesterov', action='store_true', help='SGD nesterov')

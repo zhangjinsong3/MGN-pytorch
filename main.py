@@ -16,7 +16,7 @@ trainer = Trainer(args, model, loss, loader, ckpt)
 
 n = 0
 while not trainer.terminate():
-	n += 1
-	trainer.train()
-	if args.test_every!=0 and n%args.test_every==0:
-		trainer.test()
+    n += 1
+    trainer.train()
+    if args.test_every != 0 and n % args.test_every == 0:
+        trainer.test()

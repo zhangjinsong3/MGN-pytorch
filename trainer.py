@@ -22,7 +22,6 @@ class Trainer():
         self.optimizer = utility.make_optimizer(args, self.model)
         self.scheduler = utility.make_scheduler(args, self.optimizer)
         self.device = torch.device('cpu' if args.cpu else 'cuda')
-
         if args.load != '':
             self.optimizer.load_state_dict(
                 torch.load(os.path.join(ckpt.dir, 'optimizer.pt'))
@@ -33,6 +32,7 @@ class Trainer():
         self.scheduler.step()
         self.loss.step()
         epoch = self.scheduler.last_epoch + 1
+
         lr = self.scheduler.get_lr()[0]
         if lr != self.lr:
             self.ckpt.write_log('[INFO] Epoch: {}\tLearning rate: {:.2e}'.format(epoch, lr))

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #mAP: 0.9204 rank1: 0.9469 rank3: 0.9664 rank5: 0.9715 rank10: 0.9780 (Best: 0.9204 @epoch 4)
 #CUDA_VISIBLE_DEVICES=2,3 python3 main.py --reset --datadir ../reid-mgn/Market-1501-v15.09.15/ --batchid 16 --batchtest 32 --test_every 40 --epochs 160 --decay_type step_120_140 --loss 1*CrossEntropy+2*Triplet --margin 0.3 --re_rank --random_erasing --save MGN_adam --nGPU 2  --lr 2e-4 --optimizer ADAM
 

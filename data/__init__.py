@@ -28,10 +28,11 @@ class Data:
             module_train = import_module('data.' + args.data_train.lower())
             self.trainset = getattr(module_train, args.data_train)(args, train_transform, 'train')
             self.train_loader = dataloader.DataLoader(self.trainset,
-                            sampler=RandomSampler(self.trainset,args.batchid,batch_image=args.batchimage),
-                            #shuffle=True,
-                            batch_size=args.batchid * args.batchimage,
-                            num_workers=args.nThread)
+                                                      sampler=RandomSampler(self.trainset, args.batchid,
+                                                                            batch_image=args.batchimage),
+                                                      # shuffle=True,
+                                                      batch_size=args.batchid * args.batchimage,
+                                                      num_workers=args.nThread)
         else:
             self.train_loader = None
         

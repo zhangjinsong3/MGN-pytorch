@@ -134,12 +134,14 @@ def make_optimizer(args, model):
 
 def make_scheduler(args, optimizer):
     if args.decay_type == 'step':
+        print("stepLR")
         scheduler = lrs.StepLR(
             optimizer,
             step_size=args.lr_decay,
             gamma=args.gamma
         )
     elif args.decay_type.find('step') >= 0:
+        print('multistepLR')
         milestones = args.decay_type.split('_')
         milestones.pop(0)
         milestones = list(map(lambda x: int(x), milestones))
@@ -148,6 +150,12 @@ def make_scheduler(args, optimizer):
             milestones=milestones,
             gamma=args.gamma
         )
+
+    if torch.__version__ == '1.1.0':
+        print('last_epoch : %d' % scheduler.last_epoch)
+        # Note: To solve 'ValueError: x and y must have same first dimension, but have shapes (2,) and (1,)'
+        # 200 server use pytorch 1.1.0, but get the last epoch = 0. I don`t know why!
+        scheduler.last_epoch -= 1
 
     return scheduler
 
