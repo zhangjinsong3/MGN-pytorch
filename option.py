@@ -50,6 +50,7 @@ parser.add_argument("--margin", type=float, default=1.2, help='')
 parser.add_argument("--re_rank", action='store_true', help='')
 parser.add_argument("--random_erasing", action='store_true', help='')
 parser.add_argument("--probability", type=float, default=0.5, help='')
+parser.add_argument("--resize_keep_aspect_ratio", action='store_true', help='')
 
 parser.add_argument("--savedir", type=str, default='saved_models', help='directory name to save')
 parser.add_argument("--outdir", type=str, default='out', help='')

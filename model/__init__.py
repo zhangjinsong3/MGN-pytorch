@@ -60,6 +60,7 @@ class Model(nn.Module):
             kwargs = {}
 
         if resume == -1:
+            print("resume from mode_latest!")
             self.get_model().load_state_dict(
                 torch.load(
                     os.path.join(apath, 'model', 'model_latest.pt'),
@@ -75,6 +76,7 @@ class Model(nn.Module):
                     strict=False
                 )
         else:
+            print("resume from model_{}.pt!".format(resume))
             self.get_model().load_state_dict(
                 torch.load(
                     os.path.join(apath, 'model', 'model_{}.pt'.format(resume)),
