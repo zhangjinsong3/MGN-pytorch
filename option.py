@@ -48,9 +48,6 @@ parser.add_argument('--lr_decay', type=int, default=60, help='learning rate deca
 
 parser.add_argument("--margin", type=float, default=1.2, help='')
 parser.add_argument("--re_rank", action='store_true', help='')
-parser.add_argument("--random_erasing", action='store_true', help='')
-parser.add_argument("--probability", type=float, default=0.5, help='')
-parser.add_argument("--resize_keep_aspect_ratio", action='store_true', help='')
 
 parser.add_argument("--savedir", type=str, default='saved_models', help='directory name to save')
 parser.add_argument("--outdir", type=str, default='out', help='')
@@ -59,6 +56,15 @@ parser.add_argument('--save', type=str, default='test', help='file name to save'
 parser.add_argument('--load', type=str, default='', help='file name to load')
 parser.add_argument('--save_models', action='store_true', help='save all intermediate models')
 parser.add_argument('--pre_train', type=str, default='', help='pre-trained model directory')
+
+####################################################################################################################
+# Data Augmentation
+parser.add_argument("--random_erasing", action='store_true', help='')
+parser.add_argument("--random_crop", action='store_true', help='')
+parser.add_argument("--color_jitter", action='store_true', help='')
+parser.add_argument("--probability", type=float, default=0.5, help='')
+parser.add_argument("--resize_keep_aspect_ratio", action='store_true', help='')
+####################################################################################################################
 
 parser.add_argument('--debug_mode', action='store_true', help='set to run in debug mode')
 

@@ -3,21 +3,32 @@ from torchvision import transforms
 from utils.random_erasing import RandomErasing
 from data.sampler import RandomSampler
 from torch.utils.data import dataloader
+from data.common import Random2DTranslation, ColorAugmentation
 
 class Data:
     def __init__(self, args):
+        # 1. Training transforms
+        train_list = []
 
-        train_list = [
-            transforms.Resize((args.height, args.width), interpolation=3),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ]
+        if args.random_crop:
+            train_list.append(Random2DTranslation(args.height, args.width, 0.5))
+        else:
+            train_list.append(transforms.Resize((args.height, args.width), interpolation=3))
+
+        train_list.append(transforms.RandomHorizontalFlip())
+
+        if args.color_jitter:
+            train_list.append(transforms.ColorJitter(brightness=0.2, contrast=0.15, saturation=0, hue=0))
+
+        train_list.append(transforms.ToTensor())
+        train_list.append(transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
+
         if args.random_erasing:
             train_list.append(RandomErasing(probability=args.probability, mean=[0.0, 0.0, 0.0]))
 
         train_transform = transforms.Compose(train_list)
 
+        # 2. Test transforms
         test_transform = transforms.Compose([
             transforms.Resize((args.height, args.width), interpolation=3),
             transforms.ToTensor(),

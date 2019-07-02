@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import utils.utility as utility
 from scipy.spatial.distance import cdist
-from utils.functions import cmc, mean_ap
+from utils.functions import cmc, mean_ap, eval_market1501
 from utils.re_ranking import re_ranking
 
 class Trainer():
@@ -94,6 +94,10 @@ class Trainer():
             (best[1][0] + 1)*self.args.test_every
             )
         )
+        # Another method to calculate cmc and mAP, it get the same result!
+        # print(eval_market1501(dist, self.queryset.ids, self.testset.ids,
+        #                       self.queryset.cameras, self.testset.cameras, 100))
+
         if not self.args.test_only:
             self.ckpt.save(self, epoch, is_best=((best[1][0] + 1)*self.args.test_every == epoch))
 

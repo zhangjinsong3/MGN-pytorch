@@ -50,7 +50,7 @@ for folder in folders:
 #     # print('copy image from %s to %s' % (old_path, copy_path))
 #     shutil.copy(old_path, copy_path)
 
-# As the readme file say, we should set p images as gallery and q images as query
+# As the readme file says, we should set p images as gallery and q images as query
 # Remove query folder and move q image in test folder to query folder
 shutil.rmtree(join(data_path, 'query'))
 os.makedirs(join(data_path, 'query'))
