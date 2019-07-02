@@ -22,5 +22,5 @@ CUDA_VISIBLE_DEVICES=6,7 python main.py  \
 --optimizer ADAM \
 --save_models \
 --resize_keep_aspect_ratio \
---re_rank \
+--re_rank \  # It seems that re_rank does not works well on Boxes dataset
 --pre_train ./experiment/Boxes_MGN_adam_margin_1.2/model/model_160.pt

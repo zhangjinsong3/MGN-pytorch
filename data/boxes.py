@@ -19,11 +19,20 @@ class Boxes(dataset.Dataset):
 
         data_path = args.datadir
         if dtype == 'train':
-            data_path += '/train'
+            if args.debug_mode:
+                data_path += '/train_debug'
+            else:
+                data_path += '/train'
         elif dtype == 'test':
-            data_path += '/test'
+            if args.debug_mode:
+                data_path += '/test_debug'
+            else:
+                data_path += '/test'
         else:
-            data_path += '/query'
+            if args.debug_mode:
+                data_path += '/query_debug'
+            else:
+                data_path += '/query'
 
         self.imgs = [path for path in list_pictures(data_path) if self.id(path) != -1]
 
@@ -33,7 +42,6 @@ class Boxes(dataset.Dataset):
         path = self.imgs[index]
         target = self._id2label[self.id(path)]
 
-        # TODO(zjs): image should be resize and pad with aspect ratio keeping
         img = self.loader(path)
 
         if self.use_resize_keep_aspect_ratio:
@@ -61,7 +69,6 @@ class Boxes(dataset.Dataset):
         :param file_path: unix style file path
         :return: camera id
         """
-        print()
         return int(file_path.split('/')[-1].split('.')[0].split('_')[2])
 
     @property

@@ -60,6 +60,8 @@ parser.add_argument('--load', type=str, default='', help='file name to load')
 parser.add_argument('--save_models', action='store_true', help='save all intermediate models')
 parser.add_argument('--pre_train', type=str, default='', help='pre-trained model directory')
 
+parser.add_argument('--debug_mode', action='store_true', help='set to run in debug mode')
+
 args = parser.parse_args()
 
 for arg in vars(args):
