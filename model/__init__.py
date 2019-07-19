@@ -78,7 +78,7 @@ class Model(nn.Module):
             else:
                 print('No resume, randomly init model!')
         else:
-            print("resume from model_{}.pt!".format(os.path.join(apath, 'model', 'model_{}.pt'.format(resume))))
+            print("resume from ", (os.path.join(apath, 'model', 'model_{}.pt'.format(resume))))
             self.get_model().load_state_dict(
                 torch.load(
                     os.path.join(apath, 'model', 'model_{}.pt'.format(resume)),

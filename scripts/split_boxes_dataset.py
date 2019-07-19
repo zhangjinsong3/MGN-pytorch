@@ -24,19 +24,19 @@ for folder in folders:
     if not os.path.exists(join(data_path, folder)):
         os.makedirs(join(data_path, folder))
 
-# # copy train test images
-# for image_info in tqdm(images_info):
-#     copy_folder = ''
-#
-#     if int(image_info['id']) < train_ids:
-#         copy_folder = 'train'
-#     else:
-#         copy_folder = 'test'
-#
-#     old_path = join(data_path, 'Image', image_info['image_name'])
-#     copy_path = join(data_path, copy_folder, image_info['image_name'])
-#     # print('copy image from %s to %s' % (old_path, copy_path))
-#     shutil.copy(old_path, copy_path)
+# copy train test images
+for image_info in tqdm(images_info):
+    copy_folder = ''
+
+    if int(image_info['id']) < train_ids:
+        copy_folder = 'train'
+    else:
+        copy_folder = 'test'
+
+    old_path = join(data_path, 'Image', image_info['image_name'])
+    copy_path = join(data_path, copy_folder, image_info['image_name'])
+    # print('copy image from %s to %s' % (old_path, copy_path))
+    shutil.copy(old_path, copy_path)
 
 
 # # randomly copy an p image to query image

@@ -4,7 +4,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from torchvision.models.resnet import resnet50, Bottleneck
+from torchvision.models.resnet import resnet50, Bottleneck, conv1x1
 
 def make_model(args):
     return MGN(args)
@@ -34,12 +34,12 @@ class MGN(nn.Module):
             Bottleneck(1024, 512, downsample=nn.Sequential(nn.Conv2d(1024, 2048, 1, bias=False), nn.BatchNorm2d(2048))),
             Bottleneck(2048, 512),
             Bottleneck(2048, 512))
+
         res_p_conv5.load_state_dict(resnet.layer4.state_dict())
 
         self.p1 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_g_conv5))
         self.p2 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_p_conv5))
         self.p3 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_p_conv5))
-
         ##########################################################################
         # Note(zjs): make the kernel size flexible for input image shape
         # if args.pool == 'max':
@@ -48,12 +48,18 @@ class MGN(nn.Module):
         #     pool2d = nn.AvgPool2d
         # else:
         #     raise Exception()
-        #
+        # # input shape (384, 128)
         # self.maxpool_zg_p1 = pool2d(kernel_size=(12, 4))
         # self.maxpool_zg_p2 = pool2d(kernel_size=(24, 8))
         # self.maxpool_zg_p3 = pool2d(kernel_size=(24, 8))
         # self.maxpool_zp2 = pool2d(kernel_size=(12, 8))
         # self.maxpool_zp3 = pool2d(kernel_size=(8, 8))
+        # input shape (256, 256)
+        # self.maxpool_zg_p1 = pool2d(kernel_size=(8, 8))
+        # self.maxpool_zg_p2 = pool2d(kernel_size=(16, 16))
+        # self.maxpool_zg_p3 = pool2d(kernel_size=(16, 16))
+        # self.maxpool_zp2 = pool2d(kernel_size=(8, 16))
+        # self.maxpool_zp3 = pool2d(kernel_size=(5, 16))
 
         if args.pool == 'max':
             pool2d = nn.AdaptiveMaxPool2d
@@ -138,7 +144,7 @@ class MGN(nn.Module):
         z0_p3 = zp3[:, :, 0:1, :]
         z1_p3 = zp3[:, :, 1:2, :]
         z2_p3 = zp3[:, :, 2:3, :]
-        
+
         fg_p1 = self.reduction_0(zg_p1).squeeze(dim=3).squeeze(dim=2)
         fg_p2 = self.reduction_1(zg_p2).squeeze(dim=3).squeeze(dim=2)
         fg_p3 = self.reduction_2(zg_p3).squeeze(dim=3).squeeze(dim=2)
@@ -156,7 +162,7 @@ class MGN(nn.Module):
         l_p1 = self.fc_id_2048_0(fg_p1)
         l_p2 = self.fc_id_2048_1(fg_p2)
         l_p3 = self.fc_id_2048_2(fg_p3)
-        
+
         l0_p2 = self.fc_id_256_1_0(f0_p2)
         l1_p2 = self.fc_id_256_1_1(f1_p2)
         l0_p3 = self.fc_id_256_2_0(f0_p3)

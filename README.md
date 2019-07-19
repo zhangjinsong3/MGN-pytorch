@@ -3,22 +3,22 @@ Reproduction of paper:[Learning Discriminative Features with Multiple Granularit
 
 ## Dependencies
 
-- Python >= 3.5
-- PyTorch >= 0.4.0
-- TorchVision
-- Matplotlib
-- Argparse
-- Sklearn
-- Pillow
-- Numpy
-- Scipy
-- Tqdm
+- python >= 3.5
+- pytorch >= 0.4.0
+- torchvision
+- matplotlib
+- sklearn
+- opencv
+- pillow
+- numpy
+- scipy
+- tqdm
 
 ## Train
 
 ### Prepare training data
 
-Download Market1501 training data.[here](http://www.liangzheng.org/Project/project_reid.html)
+Download Market1501 training data.[here](http://blog.fangchengjin.cn/reid-market-1501.html)
 
 ### Begin to train
 

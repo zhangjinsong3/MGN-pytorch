@@ -40,7 +40,7 @@ class Trainer():
         self.loss.start_log()
         self.model.train()
 
-        for batch, (inputs, labels) in enumerate(self.train_loader):
+        for batch, (inputs, labels, _) in enumerate(self.train_loader):
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
 
@@ -64,8 +64,10 @@ class Trainer():
         self.model.eval()
 
         self.ckpt.add_log(torch.zeros(1, 5))
-        qf = self.extract_feature(self.query_loader).numpy()
-        gf = self.extract_feature(self.test_loader).numpy()
+        qf, q_image_paths = self.extract_feature(self.query_loader)
+        gf, _ = self.extract_feature(self.test_loader)
+        qf = qf.numpy()  # (31, 2048) for debug
+        gf = gf.numpy()  # (154, 2048) for
 
         if self.args.re_rank:
             q_g_dist = np.dot(qf, np.transpose(gf))
@@ -74,6 +76,21 @@ class Trainer():
             dist = re_ranking(q_g_dist, q_q_dist, g_g_dist)
         else:
             dist = cdist(qf, gf)
+
+        if self.args.multi_query:
+            # Suitable for boxes dataset only
+            # Use several same id query samples to retrieval one gallery
+            print(dist.shape)  # (31, 154)
+            ids = [int(x.split(os.sep)[-1].split('_')[0]) for x in q_image_paths]
+            ids_set = set(ids)
+            ids_np = np.asarray(ids, dtype=np.int32)
+
+            for id in ids_set:
+                indices = np.where(ids_np == id)[0]
+                mean = np.mean(dist[indices, :], axis=0)
+                for index in indices:
+                    dist[index, :] = mean
+
         r = cmc(dist, self.queryset.ids, self.testset.ids, self.queryset.cameras, self.testset.cameras,
                 separate_camera_set=False,
                 single_gallery_shot=False,
@@ -107,7 +124,8 @@ class Trainer():
 
     def extract_feature(self, loader):
         features = torch.FloatTensor()
-        for (inputs, labels) in loader:
+        image_paths = list()
+        for (inputs, labels, image_path) in loader:
             ff = torch.FloatTensor(inputs.size(0), 2048).zero_()
             for i in range(2):
                 if i==1:
@@ -121,7 +139,9 @@ class Trainer():
             ff = ff.div(fnorm.expand_as(ff))
 
             features = torch.cat((features, ff), 0)
-        return features
+            for path in image_path:
+                image_paths.append(path)
+        return features, image_paths
 
     def terminate(self):
         if self.args.test_only:

@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import numpy as np
 import torch
 import random
 from PIL import Image
+import matplotlib.pyplot as plt
 
 
 def list_pictures(directory, ext='jpg|jpeg|bmp|png|ppm'):
@@ -13,6 +15,34 @@ def list_pictures(directory, ext='jpg|jpeg|bmp|png|ppm'):
     return sorted([os.path.join(root, f)
                    for root, _, files in os.walk(directory) for f in files
                    if re.match(r'([\w]+\.(?:' + ext + '))', f)])
+
+
+def visual_distribution(data):
+    import matplotlib
+    matplotlib.use('Qt5Agg')
+
+    def normfun(x, mu, sigma):
+        pdf = np.exp(-((x - mu)**2)/(2*sigma**2)) / (sigma * np.sqrt(2*np.pi))
+        return pdf
+
+    data = np.asarray(data)
+    mean = data.mean()
+    std = data.std()
+    print('mean: %2.2f, std: %2.2f' % (mean, std))
+
+    # 拟合的正态分布曲线
+    x = np.arange(0, 1, 0.01)
+    y = normfun(x, mean, std)
+    plt.plot(x, y)
+
+    # 数据分布图
+    plt.hist(data, bins=20, density=True)  # bins:柱数,
+    plt.title('distance distribution')
+    plt.xlabel('distance')
+    plt.ylabel('probability')
+    plt.show()
+
+    return mean, std
 
 
 class Random2DTranslation(object):
