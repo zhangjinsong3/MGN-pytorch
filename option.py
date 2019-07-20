@@ -66,7 +66,10 @@ parser.add_argument("--probability", type=float, default=0.5, help='')
 parser.add_argument("--resize_keep_aspect_ratio", action='store_true', help='')
 ####################################################################################################################
 
-parser.add_argument('--debug_mode', action='store_true', help='set to run in debug mode')
+parser.add_argument('--debug_mode', action='store_true',
+                    help='set to run in debug mode')
+parser.add_argument('--use_mask', action='store_true',
+                    help='set to train and test with object mask information')
 parser.add_argument('--multi_query', action='store_true',
                     help='set to run with multi-query mode, which is suitable for Boxes dataset')
 

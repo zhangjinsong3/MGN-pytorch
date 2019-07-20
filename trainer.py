@@ -75,7 +75,7 @@ class Trainer():
             g_g_dist = np.dot(gf, np.transpose(gf))
             dist = re_ranking(q_g_dist, q_q_dist, g_g_dist)
         else:
-            dist = cdist(qf, gf)
+            dist = cdist(qf, gf, metric='cosine')
 
         if self.args.multi_query:
             # Suitable for boxes dataset only

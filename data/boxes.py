@@ -16,6 +16,7 @@ class Boxes(dataset.Dataset):
         self.width = args.width
         self.height = args.height
         self.use_resize_keep_aspect_ratio = args.resize_keep_aspect_ratio
+        self.use_mask = args.use_mask
 
         data_path = args.datadir
         if dtype == 'train':
@@ -38,15 +39,44 @@ class Boxes(dataset.Dataset):
 
         self._id2label = {_id: idx for idx, _id in enumerate(self.unique_ids)}
 
+        if self.use_mask:
+            self.mask = list()
+            import os
+            info_path = os.path.join(args.datadir, 'Info/train.json')
+            assert os.path.exists(info_path), '%s do not exits!' % info_path
+
+            import json
+            js = json.load(open(info_path, 'r'))
+            images_info = js['image']
+
+            for image_path in self.imgs:
+                _, image_name = os.path.split(image_path)
+                image_mask = [x['mask'] for x in images_info if x['image_name']==image_name]
+                assert len(image_mask)==1, '%s does not found a unique mask!' % image_path
+
+                self.mask.append(image_mask[0])
+
     def __getitem__(self, index):
         path = self.imgs[index]
         target = self._id2label[self.id(path)]
 
         img = self.loader(path)
 
+        if self.use_mask:
+            if isinstance(img, Image.Image):
+                img = np.asarray(img)
+            x = np.array(self.mask[index][0::2])
+            y = np.array(self.mask[index][1::2])
+            xy = np.vstack((x, y)).transpose(1, 0)
+            mask = np.zeros_like(img)
+            cv2.fillPoly(mask, np.int32([xy]), (1, 1, 1))
+            img = img * mask
+            if not isinstance(img, Image.Image):
+                img = Image.fromarray(np.uint8(img))
+
         if self.use_resize_keep_aspect_ratio:
             img = self.resize_keep_aspect_ratio(img, self.width, self.height,
-                                                interpolation=cv2.INTER_LINEAR, color=(127, 127, 127))
+                                                interpolation=cv2.INTER_LINEAR, color=(0, 0, 0))
         if self.transform is not None:
             img = self.transform(img)
 
