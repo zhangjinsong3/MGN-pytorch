@@ -4,7 +4,10 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from torchvision.models.resnet import resnet50, resnet101, Bottleneck, conv1x1
+from torchvision.models.resnet import resnet50, Bottleneck
+# import sys
+# sys.path.append('/media/zjs/A638551F3854F033/base_net_ops/pretrained-models.pytorch')
+# from pretrainedmodels.models.resnext import resnext101_64x4d
 
 def make_model(args):
     return MGN(args)
@@ -15,6 +18,7 @@ class MGN(nn.Module):
         num_classes = args.num_classes
 
         resnet = resnet50(pretrained=True)
+        # resnext = resnext101_64x4d(pretrained='imagenet')
         self.backone = nn.Sequential(
             resnet.conv1,
             resnet.bn1,

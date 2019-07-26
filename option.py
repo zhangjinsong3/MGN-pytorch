@@ -72,6 +72,10 @@ parser.add_argument('--use_mask', action='store_true',
                     help='set to train and test with object mask information')
 parser.add_argument('--multi_query', action='store_true',
                     help='set to run with multi-query mode, which is suitable for Boxes dataset')
+parser.add_argument('--multi_gallery', action='store_true',
+                    help='set to run with multi-gallery mode, which is suitable for Boxes dataset')
+parser.add_argument('--retrieval_only', action='store_true',
+                    help='run retrieval and output an csv file')
 
 args = parser.parse_args()
 

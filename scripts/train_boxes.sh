@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# Note: 200 server has no enough shared memory, set nThread and batch smaller.
-CUDA_VISIBLE_DEVICES=2,3 python main.py  \
+CUDA_VISIBLE_DEVICES=2,6 python main.py  \
 --datadir ../../Opensource_datasets/Boxes  \
 --data_train Boxes \
 --data_test Boxes \
---num_classes 3000 \
+--num_classes 3719 \
 --height 384 \
 --width 384 \
 --batchid 16  \
@@ -16,16 +15,18 @@ CUDA_VISIBLE_DEVICES=2,3 python main.py  \
 --margin 0.6  \
 --random_erasing  \
 --random_crop \
---save Boxes_MGN_adam_margin_0.6_resize_keep_aspect_ratio_new_dataset_augmentations_384_mask \
+--save Boxes_MGN_adam_margin_0.6_resize_keep_aspect_ratio_new_dataset_augmentations_384_num_classes_3719  \
 --nThread 8 \
 --nGPU 2   \
 --lr 2e-4  \
 --optimizer ADAM \
 --save_models \
 --resize_keep_aspect_ratio \
---use_mask
+--resume 180  \
+--test_only
+#--multi_gallery \
+#--retrieval_only
 #--test_only
-#--resume 180 \
-#--multi_query
-# --re_rank   # It seems that re_rank does not works well on Boxes dataset
+#--use_mask  \
+#--re_rank   # It seems that re_rank does not works well on Boxes dataset
 #--color_jitter \

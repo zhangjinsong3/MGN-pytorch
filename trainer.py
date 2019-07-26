@@ -65,7 +65,7 @@ class Trainer():
 
         self.ckpt.add_log(torch.zeros(1, 5))
         qf, q_image_paths = self.extract_feature(self.query_loader)
-        gf, _ = self.extract_feature(self.test_loader)
+        gf, g_image_paths = self.extract_feature(self.test_loader)
         qf = qf.numpy()  # (31, 2048) for debug
         gf = gf.numpy()  # (154, 2048) for
 
@@ -75,7 +75,7 @@ class Trainer():
             g_g_dist = np.dot(gf, np.transpose(gf))
             dist = re_ranking(q_g_dist, q_q_dist, g_g_dist)
         else:
-            dist = cdist(qf, gf, metric='cosine')
+            dist = cdist(qf, gf, metric='euclidean')
 
         if self.args.multi_query:
             # Suitable for boxes dataset only
@@ -90,6 +90,22 @@ class Trainer():
                 mean = np.mean(dist[indices, :], axis=0)
                 for index in indices:
                     dist[index, :] = mean
+
+        if self.args.multi_gallery:
+            # Suitable for boxes dataset only
+            # query samples to retrieval images and mean the same id of gallery
+            print(dist.shape)  # (31, 154) for debug
+
+            ids = [int(x.split(os.sep)[-1].split('_')[0]) for x in g_image_paths]
+
+            ids_set = set(ids)
+            ids_np = np.asarray(ids, dtype=np.int32)
+
+            for i, q_image_path in enumerate(q_image_paths):
+                for id in ids_set:
+                    indices = np.where(ids_np == id)[0]
+                    mean = np.mean(dist[i, indices], axis=0)
+                    dist[i, indices] = mean
 
         r = cmc(dist, self.queryset.ids, self.testset.ids, self.queryset.cameras, self.testset.cameras,
                 separate_camera_set=False,
@@ -117,6 +133,67 @@ class Trainer():
 
         if not self.args.test_only:
             self.ckpt.save(self, epoch, is_best=((best[1][0] + 1)*self.args.test_every == epoch))
+
+    def retrieval(self):
+        epoch = self.scheduler.last_epoch + 1
+        self.ckpt.write_log('\n[INFO] Test:')
+        self.model.eval()
+
+        self.ckpt.add_log(torch.zeros(1, 5))
+        qf, q_image_paths = self.extract_feature(self.query_loader)
+        gf, g_image_paths = self.extract_feature(self.test_loader)
+        qf = qf.numpy()  # (31, 2048) for debug
+        gf = gf.numpy()  # (154, 2048) for debug
+
+        if self.args.re_rank:
+            q_g_dist = np.dot(qf, np.transpose(gf))
+            q_q_dist = np.dot(qf, np.transpose(qf))
+            g_g_dist = np.dot(gf, np.transpose(gf))
+            dist = re_ranking(q_g_dist, q_q_dist, g_g_dist)
+        else:
+            dist = cdist(qf, gf)  # (31, 154) for debug
+
+        if self.args.multi_query:
+            # Suitable for boxes dataset only
+            # Use several same id query samples to retrieval one gallery
+            print(dist.shape)  # (31, 154) for debug
+            ids = [int(x.split(os.sep)[-1].split('_')[0]) for x in q_image_paths]
+            ids_set = set(ids)
+            ids_np = np.asarray(ids, dtype=np.int32)
+
+            for id in ids_set:
+                indices = np.where(ids_np == id)[0]
+                mean = np.mean(dist[indices, :], axis=0)
+                for index in indices:
+                    dist[index, :] = mean
+
+        if self.args.multi_gallery:
+            # Suitable for boxes dataset only
+            # query samples to retrieval images and mean the same id of gallery
+            print(dist.shape)  # (31, 154) for debug
+
+            ids = [int(x.split(os.sep)[-1].split('_')[0]) for x in g_image_paths]
+
+            ids_set = set(ids)
+            ids_np = np.asarray(ids, dtype=np.int32)
+
+            for i, q_image_path in enumerate(q_image_paths):
+                for id in ids_set:
+                    indices = np.where(ids_np == id)[0]
+                    mean = np.mean(dist[i, indices], axis=0)
+                    dist[i, indices] = mean
+
+        # Output csv file
+        indices = np.argsort(dist, axis=1)
+        import csv
+        with open(os.path.join('retrieval.csv'), 'w') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=',')
+            for i, q_image_path in enumerate(q_image_paths):
+                row_string = [os.path.basename(q_image_path)]
+                for j, index in enumerate(indices[i]):
+                    row_string.append(os.path.basename(g_image_paths[index]))
+                    row_string.append(str(-np.log(dist[i, index] + 1e-6)))
+                spamwriter.writerow(row_string)
 
     def fliphor(self, inputs):
         inv_idx = torch.arange(inputs.size(3)-1, -1, -1).long()  # N x C x H x W
@@ -146,6 +223,9 @@ class Trainer():
     def terminate(self):
         if self.args.test_only:
             self.test()
+            return True
+        elif self.args.retrieval_only:
+            self.retrieval()
             return True
         else:
             epoch = self.scheduler.last_epoch + 1

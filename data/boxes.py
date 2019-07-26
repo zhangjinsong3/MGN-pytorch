@@ -29,11 +29,13 @@ class Boxes(dataset.Dataset):
                 data_path += '/test_debug'
             else:
                 data_path += '/test'
+                # data_path += '/MVB_val/Image/gallery'
         else:
             if args.debug_mode:
                 data_path += '/query_debug'
             else:
                 data_path += '/query'
+                # data_path += '/MVB_val/Image/probe'
 
         self.imgs = [path for path in list_pictures(data_path) if self.id(path) != -1]
 
@@ -52,7 +54,7 @@ class Boxes(dataset.Dataset):
             for image_path in self.imgs:
                 _, image_name = os.path.split(image_path)
                 image_mask = [x['mask'] for x in images_info if x['image_name']==image_name]
-                assert len(image_mask)==1, '%s does not found a unique mask!' % image_path
+                assert len(image_mask) == 1, '%s does not found a unique mask!' % image_path
 
                 self.mask.append(image_mask[0])
 
@@ -67,7 +69,7 @@ class Boxes(dataset.Dataset):
                 img = np.asarray(img)
             x = np.array(self.mask[index][0::2])
             y = np.array(self.mask[index][1::2])
-            xy = np.vstack((x, y)).transpose(1, 0)
+            xy = np.vstack((x, y)).transpose()
             mask = np.zeros_like(img)
             cv2.fillPoly(mask, np.int32([xy]), (1, 1, 1))
             img = img * mask
@@ -76,7 +78,7 @@ class Boxes(dataset.Dataset):
 
         if self.use_resize_keep_aspect_ratio:
             img = self.resize_keep_aspect_ratio(img, self.width, self.height,
-                                                interpolation=cv2.INTER_LINEAR, color=(0, 0, 0))
+                                                interpolation=cv2.INTER_LINEAR, color=(127, 127, 127))
         if self.transform is not None:
             img = self.transform(img)
 
@@ -91,7 +93,10 @@ class Boxes(dataset.Dataset):
         :param file_path: unix style file path
         :return: person id
         """
-        return int(file_path.split('/')[-1].split('_')[0])
+        if file_path.split('/')[-1].find('_') >=0:
+            return int(file_path.split('/')[-1].split('_')[0])
+        else:
+            return 10000  # ugly code for retrieval
 
     @staticmethod
     def camera(file_path):
@@ -99,10 +104,13 @@ class Boxes(dataset.Dataset):
         :param file_path: unix style file path
         :return: camera id
         """
-        add = 0
-        if file_path.split('/')[-1].split('.')[0].split('_')[1] == 'p':
-            add += 10
-        return int(file_path.split('/')[-1].split('.')[0].split('_')[2]) + add
+        if file_path.split('/')[-1].find('_') >=0:
+            add = 0
+            if file_path.split('/')[-1].split('.')[0].split('_')[1] == 'p':
+                add += 10
+            return int(file_path.split('/')[-1].split('.')[0].split('_')[2]) + add
+        else:
+            return 20  # ugly code for retrieval
 
     @property
     def ids(self):

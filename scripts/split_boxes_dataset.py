@@ -24,19 +24,19 @@ for folder in folders:
     if not os.path.exists(join(data_path, folder)):
         os.makedirs(join(data_path, folder))
 
-# copy train test images
-for image_info in tqdm(images_info):
-    copy_folder = ''
-
-    if int(image_info['id']) < train_ids:
-        copy_folder = 'train'
-    else:
-        copy_folder = 'test'
-
-    old_path = join(data_path, 'Image', image_info['image_name'])
-    copy_path = join(data_path, copy_folder, image_info['image_name'])
-    # print('copy image from %s to %s' % (old_path, copy_path))
-    shutil.copy(old_path, copy_path)
+# # copy train test images
+# for image_info in tqdm(images_info):
+#     copy_folder = ''
+#
+#     if int(image_info['id']) < train_ids:
+#         copy_folder = 'train'
+#     else:
+#         copy_folder = 'test'
+#
+#     old_path = join(data_path, 'Image', image_info['image_name'])
+#     copy_path = join(data_path, copy_folder, image_info['image_name'])
+#     # print('copy image from %s to %s' % (old_path, copy_path))
+#     shutil.copy(old_path, copy_path)
 
 
 # # randomly copy an p image to query image
@@ -51,9 +51,9 @@ for image_info in tqdm(images_info):
 #     shutil.copy(old_path, copy_path)
 
 # As the readme file says, we should set p images as gallery and q images as query
-# Remove query folder and move q image in test folder to query folder
-shutil.rmtree(join(data_path, 'query'))
-os.makedirs(join(data_path, 'query'))
+# Remove query folder and move p image in test folder to query folder
+# shutil.rmtree(join(data_path, 'query'))
+# os.makedirs(join(data_path, 'query'))
 for image in os.listdir(join(data_path, 'test')):
-    if image.split('_')[1] == 'g':
+    if image.split('_')[1] == 'p':
         shutil.move(join(data_path, 'test', image), join(data_path, 'query', image))
